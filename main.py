@@ -70,6 +70,19 @@ def ask_memory(payload: QueryRequest):
     cursor.execute("SELECT * FROM memories")
     memories = [dict(row) for row in cursor.fetchall()]
     conn.close()
+    # Simple keyword/context lookup simulation for hackathon MVP
+    matched_memories = []
+    for m in memories:
+        if any(word in m['content'].lower() or word in m['title'].lower() for word in question.split() if len(word) > 3):
+            matched_memories.append(m)
+
+    # If no specific keyword match is found, be honest instead of guessing
+    if not matched_memories:
+        return {
+            "answer": "I couldn't find any specific notes or documents matching that in your memory sanctuary. Try saving a note about it first! ✨",
+            "sources": [],
+            "conflict": None
+        }
 
     if not memories:
         return {
